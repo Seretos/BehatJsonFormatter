@@ -43,7 +43,7 @@ class CommandFactory {
     public function createBehatParser(){
         $keywords = [];
         if(file_exists(__DIR__.'/../../../../behat/gherkin/i18n.php')){
-            $keywords = include(__DIR__ . '/../../../../i18n.php');
+            $keywords = include(__DIR__ . '/../../../../behat/gherkin/i18n.php');
         }else if(file_exists(__DIR__.'/../../vendor/behat/gherkin/i18n.php')){
             $keywords = include(__DIR__ . '/../../vendor/behat/gherkin/i18n.php');
         }
