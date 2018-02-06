@@ -73,7 +73,10 @@ class BehatEnvironmentResult implements JsonSerializable{
      * @return BehatEnvironmentStepResult
      */
     public function getStep($line){
-        return $this->steps[$line];
+        if(isset($this->steps[$line])) {
+            return $this->steps[$line];
+        }
+        return null;
     }
 
     /**

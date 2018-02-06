@@ -12,14 +12,13 @@ namespace seretos\BehatJsonFormatter\Command;
 use Behat\Gherkin\Keywords\ArrayKeywords;
 use Behat\Gherkin\Lexer;
 use Behat\Gherkin\Parser;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-class ValidateResultCommand extends ContainerAwareCommand{
+class ValidateResultCommand extends BaseCommand {
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output

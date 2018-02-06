@@ -8,8 +8,6 @@
 
 namespace seretos\BehatJsonFormatter\Entity;
 
-
-use Behat\Gherkin\Node\TableNode;
 use JsonSerializable;
 
 class BehatStep implements JsonSerializable{

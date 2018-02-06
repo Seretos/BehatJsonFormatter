@@ -15,13 +15,13 @@ use seretos\BehatJsonFormatter\Entity\BehatFeature;
 use seretos\BehatJsonFormatter\Entity\BehatScenario;
 use seretos\BehatJsonFormatter\Entity\BehatStep;
 use seretos\BehatJsonFormatter\Entity\BehatSuite;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-class MergeResultCommand extends ContainerAwareCommand {
+class MergeResultCommand extends BaseCommand {
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
@@ -29,6 +29,7 @@ class MergeResultCommand extends ContainerAwareCommand {
      * @return int
      */
     public function execute (InputInterface $input, OutputInterface $output) {
+        /* @var $finder Finder*/
         $finder = $this->getContainer()
                        ->get('behat.json.formatter.command.factory')
                        ->createFinder();
@@ -183,7 +184,9 @@ EOT
                 $scenarioEnvironment->setPassed($result['passed']);
             }
 
-            $this->parseResultSteps($result['steps'],$scenarioEnvironment);
+            if($result['steps'] !== null) {
+                $this->parseResultSteps($result['steps'], $scenarioEnvironment);
+            }
 
             $featureScenario->addEnvironmentResult($environment,$scenarioEnvironment);
         }

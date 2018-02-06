@@ -91,7 +91,7 @@ class DoubleResultCheckCommandTest extends TestCase {
                    ->with('*.json')
                    ->will($this->returnValue([$mockFile]));
 
-        $mockFile->expects($this->once())
+        $mockFile->expects($this->any())
                  ->method('getRealPath')
                  ->will($this->returnValue('/path/to/file.json'));
 
@@ -105,15 +105,25 @@ class DoubleResultCheckCommandTest extends TestCase {
                           ->will($this->returnValue(['features' => ['fKey1' => ['scenarios' => ['sKey1' => ['results' => ['firefly' => []]]]]]]));
 
         $this->mockOutput->expects($this->at(0))
+            ->method('writeln')
+            ->with('1 files found');
+        $this->mockOutput->expects($this->at(1))
+            ->method('writeln')
+            ->with('/path/to/file.json');
+        $this->mockOutput->expects($this->at(2))
+            ->method('writeln')
+            ->with('');
+
+        $this->mockOutput->expects($this->at(3))
                          ->method('writeln')
                          ->with('check test execution counts');
-        $this->mockOutput->expects($this->at(1))
+        $this->mockOutput->expects($this->at(4))
                          ->method('write')
                          ->with('sKey1...');
-        $this->mockOutput->expects($this->at(2))
+        $this->mockOutput->expects($this->at(5))
                          ->method('write')
                          ->with(' <info>firefly[1]</info>');
-        $this->mockOutput->expects($this->at(3))
+        $this->mockOutput->expects($this->at(6))
                          ->method('writeln')
                          ->with('');
 
@@ -155,10 +165,10 @@ class DoubleResultCheckCommandTest extends TestCase {
                    ->with('*.json')
                    ->will($this->returnValue([$mockFile1,$mockFile2]));
 
-        $mockFile1->expects($this->once())
+        $mockFile1->expects($this->any())
                   ->method('getRealPath')
                   ->will($this->returnValue('/path/to/file.json'));
-        $mockFile2->expects($this->once())
+        $mockFile2->expects($this->any())
                   ->method('getRealPath')
                   ->will($this->returnValue('/path/to/file2.json'));
 
@@ -176,15 +186,28 @@ class DoubleResultCheckCommandTest extends TestCase {
                           ->will($this->returnValue(['features' => ['fKey2' => ['scenarios' => ['sKey1' => ['results' => ['firefly' => []]]]]]]));
 
         $this->mockOutput->expects($this->at(0))
+            ->method('writeln')
+            ->with('2 files found');
+        $this->mockOutput->expects($this->at(1))
+            ->method('writeln')
+            ->with('/path/to/file.json');
+        $this->mockOutput->expects($this->at(2))
+            ->method('writeln')
+            ->with('/path/to/file2.json');
+        $this->mockOutput->expects($this->at(3))
+            ->method('writeln')
+            ->with('');
+
+        $this->mockOutput->expects($this->at(4))
                          ->method('writeln')
                          ->with('check test execution counts');
-        $this->mockOutput->expects($this->at(1))
+        $this->mockOutput->expects($this->at(5))
                          ->method('write')
                          ->with('sKey1...');
-        $this->mockOutput->expects($this->at(2))
+        $this->mockOutput->expects($this->at(6))
                          ->method('write')
                          ->with(' <error>firefly[2]</error>');
-        $this->mockOutput->expects($this->at(3))
+        $this->mockOutput->expects($this->at(7))
                          ->method('writeln')
                          ->with('');
 
@@ -242,10 +265,10 @@ class DoubleResultCheckCommandTest extends TestCase {
                    ->with('*.json')
                    ->will($this->returnValue([$mockFile2]));
 
-        $mockFile1->expects($this->once())
+        $mockFile1->expects($this->any())
                   ->method('getRealPath')
                   ->will($this->returnValue('/path/to/file.json'));
-        $mockFile2->expects($this->once())
+        $mockFile2->expects($this->any())
                   ->method('getRealPath')
                   ->will($this->returnValue('/path/to/file2.json'));
 
@@ -263,25 +286,38 @@ class DoubleResultCheckCommandTest extends TestCase {
                           ->will($this->returnValue(['features' => ['fKey2' => ['scenarios' => ['sKey2' => ['results' => ['firefly' => []]]]]]]));
 
         $this->mockOutput->expects($this->at(0))
+            ->method('writeln')
+            ->with('2 files found');
+        $this->mockOutput->expects($this->at(1))
+            ->method('writeln')
+            ->with('/path/to/file.json');
+        $this->mockOutput->expects($this->at(2))
+            ->method('writeln')
+            ->with('/path/to/file2.json');
+        $this->mockOutput->expects($this->at(3))
+            ->method('writeln')
+            ->with('');
+
+        $this->mockOutput->expects($this->at(4))
                          ->method('writeln')
                          ->with('check test execution counts');
-        $this->mockOutput->expects($this->at(1))
+        $this->mockOutput->expects($this->at(5))
                          ->method('write')
                          ->with('sKey1...');
-        $this->mockOutput->expects($this->at(2))
+        $this->mockOutput->expects($this->at(6))
                          ->method('write')
                          ->with(' <info>firefly[1]</info>');
-        $this->mockOutput->expects($this->at(3))
+        $this->mockOutput->expects($this->at(7))
                          ->method('writeln')
                          ->with('');
 
-        $this->mockOutput->expects($this->at(4))
+        $this->mockOutput->expects($this->at(8))
                          ->method('write')
                          ->with('sKey2...');
-        $this->mockOutput->expects($this->at(5))
+        $this->mockOutput->expects($this->at(9))
                          ->method('write')
                          ->with(' <info>firefly[1]</info>');
-        $this->mockOutput->expects($this->at(6))
+        $this->mockOutput->expects($this->at(10))
                          ->method('writeln')
                          ->with('');
 

@@ -61,7 +61,10 @@ class BehatScenario implements JsonSerializable{
      * @return BehatEnvironmentResult
      */
     public function getEnvironmentResult($environment){
-        return $this->environmentResults[$environment];
+        if(isset($this->environmentResults[$environment])) {
+            return $this->environmentResults[$environment];
+        }
+        return null;
     }
 
     /**
@@ -100,7 +103,10 @@ class BehatScenario implements JsonSerializable{
      * @return BehatStep
      */
     public function getStep($line){
-        return $this->steps[$line];
+        if(isset($this->steps[$line])){
+            return $this->steps[$line];
+        }
+        return null;
     }
 
     /**
