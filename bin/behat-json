@@ -1,0 +1,24 @@
+<?php
+foreach (array(__DIR__ . '/../../../../vendor/autoload.php',__DIR__ . '/../../../autoload.php',__DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php') as $file) {
+    if (file_exists($file)) {
+        require $file;
+
+        break;
+    }
+}
+
+use seretos\BehatJsonFormatter\Application;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+
+$container = new ContainerBuilder();
+
+$loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+
+$loader->load('services.yml');
+$container->compile();
+
+$application = new Application('behat-json');
+$application->setContainer($container);
+$application->run();

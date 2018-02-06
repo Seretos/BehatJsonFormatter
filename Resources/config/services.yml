@@ -1,0 +1,3 @@
+services:
+  behat.json.formatter.command.factory:
+    class: seretos\BehatJsonFormatter\Service\CommandFactory
