@@ -11,6 +11,7 @@ namespace seretos\BehatJsonFormatter;
 
 use seretos\BehatJsonFormatter\Command\DoubleResultCheckCommand;
 use seretos\BehatJsonFormatter\Command\MergeResultCommand;
+use seretos\BehatJsonFormatter\Command\ValidateResultCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -46,6 +47,6 @@ class Application extends BaseApplication implements ContainerAwareInterface{
     }
 
     protected function registerCommands () {
-        $this->addCommands([new DoubleResultCheckCommand(), new MergeResultCommand()]);
+        $this->addCommands([new DoubleResultCheckCommand(), new MergeResultCommand(), new ValidateResultCommand()]);
     }
 }

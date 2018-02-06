@@ -8,10 +8,9 @@
 
 namespace seretos\BehatJsonFormatter\Command;
 
-
-use Behat\Gherkin\Keywords\ArrayKeywords;
-use Behat\Gherkin\Lexer;
-use Behat\Gherkin\Parser;
+use Behat\Gherkin\Node\FeatureNode;
+use Behat\Gherkin\Node\ScenarioInterface;
+use seretos\BehatJsonFormatter\Service\CommandFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,77 +25,67 @@ class ValidateResultCommand extends BaseCommand {
      * @return int
      */
     public function execute (InputInterface $input, OutputInterface $output) {
-        $finder = new Finder();
+        /* @var $factory CommandFactory*/
+        $factory = $this->getContainer()->get('behat.json.formatter.command.factory');
 
-        $keywords = new ArrayKeywords(array(
-            'en' => array(
-                'feature'          => 'Feature',
-                'background'       => 'Background',
-                'scenario'         => 'Scenario',
-                'scenario_outline' => 'Scenario Outline|Scenario Template',
-                'examples'         => 'Examples|Scenarios',
-                'given'            => 'Given',
-                'when'             => 'When',
-                'then'             => 'Then',
-                'and'              => 'And',
-                'but'              => 'But'
-            ),
-            'de' =>
-                array (
-                    'and' => 'Und|*',
-                    'background' => 'Grundlage',
-                    'but' => 'Aber|*',
-                    'examples' => 'Beispiele',
-                    'feature' => 'Funktionalität',
-                    'given' => 'Gegeben seien|Gegeben sei|Angenommen|*',
-                    'name' => 'German',
-                    'native' => 'Deutsch',
-                    'scenario' => 'Szenario',
-                    'scenario_outline' => 'Szenariogrundriss',
-                    'then' => 'Dann|*',
-                    'when' => 'Wenn|*',
-                )));
-        $lexer  = new Lexer($keywords);
-        $parser = new Parser($lexer);
+        $parser = $factory->createBehatParser();
 
-        $json = json_decode(file_get_contents($input->getOption('json')),true);
+        $json = $factory->readJson($input->getOption('json'));
+
+        $files = $this->getFeatureFiles($output, $input->getOption('featureDir'));
 
         $result = 0;
-        foreach($finder->in($input->getOption('featureDir'))
-                       ->files()
-                       ->name('*.feature') as $file){
-            /* @var $file SplFileInfo*/
-            $fileContent = file_get_contents($file->getRealPath());
-            $feature = $parser->parse($fileContent);
+        foreach($files as $file){
+            $fileContent = $factory->readFile($file);
 
             preg_match_all('/#[\h]*(Szenario|Szenariogrundriss):/', $fileContent, $matches, PREG_SET_ORDER, 0);
             if(count($matches)>0){
-                $output->writeln('<error>the file '.$file->getRealPath().' has commented scenarios</error>');
+                $output->writeln('<error>the file '.$file.' has commented scenarios</error>');
                 $result = -1;
             }
 
+            $feature = $parser->parse($fileContent);
             if($feature === null || $feature->getScenarios() === null){
-                $output->writeln('<error>empty file: '.$file->getRealPath().'</error>');
+                $output->writeln('<error>empty file: '.$file.'</error>');
                 $result = -1;
             }else {
                 foreach ($feature->getScenarios() as $scenario) {
-                    if(!$this->hasScenario($scenario->getTitle(),$json)){
+                    if(!$this->hasScenario($scenario, $feature,$json)){
                         $output->writeln('<error>scenario not executed: '.$scenario->getTitle().'</error>');
                         $result = -1;
+                    }else{
+                        $output->writeln('<info>'.$scenario->getTitle().'</info>');
                     }
-                    //var_dump($scenario->getTitle());
                 }
             }
         }
         return $result;
     }
 
-    private function hasScenario($title,$json){
+    private function getFeatureFiles(OutputInterface $output, $featureDir){
+        /* @var $finder Finder*/
+        $finder = $this->getContainer()->get('behat.json.formatter.command.factory')->createFinder();
+        $files = [];
+        $output->writeln('feature files:');
+        foreach($finder->in($featureDir)
+                    ->files()
+                    ->name('*.feature') as $file){
+            /* @var $file SplFileInfo*/
+            $files[] = $file->getRealPath();
+            $output->writeln($file->getRealPath());
+        }
+        $output->writeln('');
+        return $files;
+    }
+
+    private function hasScenario(ScenarioInterface $featureScenario, FeatureNode $featureNode,$json){
         foreach($json['suites'] as $suite){
             foreach($suite['features'] as $feature){
-                foreach($feature['scenarios'] as $currentTitle => $scenario){
-                    if($title == $currentTitle){
-                        return true;
+                if($featureNode->getTitle() == $feature['title']) {
+                    foreach ($feature['scenarios'] as $currentTitle => $scenario) {
+                        if ($featureScenario->getTitle() == $currentTitle) {
+                            return true;
+                        }
                     }
                 }
             }
