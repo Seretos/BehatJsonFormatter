@@ -9,4 +9,21 @@ before_script:
   - composer self-update
   - composer update --prefer-source
 
-script: vendor/bin/phpunit
+script:
+  - vendor/bin/phpunit
+  - composer update --no-dev
+  - composer dump-autoload --optimize --no-dev --classmap-authoritative
+  - wget https://github.com/box-project/box2/releases/download/2.7.5/box-2.7.5.phar
+  - mv box-2.7.5.phar box.phar
+  - php -dphar.readonly=0 box build -v
+  - mv behat-json.phar behat-json-$TRAVIS_BRANCH.phar
+
+deploy:
+  provider: releases
+  api_key:
+    secure: MiTSdaFRP7hN4X/TweE98jt/B3zhO+G0wtPqRkwJTb2/ijZhp70+ANINZefY8KUNRCyfI7fkZQdRICJcXX/QI8heC8JoayNIhuTUqYMObBBvwWViOOoRHmNSp7x+v49mh7bZex8kp8wvGGgXUvPdbLJsd62TUaVF+K38A+86egK1d/lFBYx3O7Lt+6yGqkY1Z1YpSaGj2kkYJfSrDm9ahkO4JGy1qaqyM35hWayto1ITCbf8VxcXnUfLDCX5f4FNr4RHBZ//sQF2fD281JnFY3sqiOMPcPNkEjd+OZ1tLN5WvDeIVXrPRCTG+DpUbyN544L5Lj7ltj0QLzJIXp8OV0wn5nxP5K24A4LgbeQ3//QGaB9MArw5RH6LYknWJnWgk1oUapHCSOXtv0OZMNC49ppj67VOAqspG5Zy90X3XiIwwRiGdmHDV5ex21GtVCf3TFhSdYTJZ18Rlr+bv8wRHr9tHO56e8g1S2xNf0t68EMuzXDMtXKWQCqqo9v7H0zSGS77aFKAfXtNyfPd+xCbY7WY88fXoYm0QQprtif+3tFQ/8xZqcCuzqub5TOrmfXm4phNXYAOF/cnZVJcQikj8baSG4ppZVz2qiIxXUrjoeDslv7UWv0zBKrJht3V9HU8zFqDE4+uE9X6maH93G4iN77z0X6Azq+kJL1kOM6UsVY=
+  file: behat-json-$TRAVIS_BRANCH.phar
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: Seretos/BehatJsonFormatter
