@@ -82,6 +82,7 @@ class BehatJsonFormatterTest extends TestCase {
                            ,'tester.suite_tested.after' => 'onAfterSuiteTested'
                            ,'tester.feature_tested.before' => 'onBeforeFeatureTested'
                            ,'tester.scenario_tested.before' => 'onBeforeScenarioTested'
+                           ,'tester.scenario_tested.after' => 'onAfterScenarioTested'
                            ,'tester.outline_tested.before' => 'onBeforeOutlineTested'
                            ,'tester.outline_tested.after' => 'onAfterOutlineTested'
                            ,'tester.step_tested.after' => 'onAfterStepTested'],BehatJsonFormatter::getSubscribedEvents());

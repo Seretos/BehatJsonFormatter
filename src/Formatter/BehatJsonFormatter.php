@@ -214,7 +214,7 @@ class BehatJsonFormatter implements Formatter {
             'tester.feature_tested.before' => 'onBeforeFeatureTested',
 //            'tester.feature_tested.after' => 'onAfterFeatureTested',
             'tester.scenario_tested.before' => 'onBeforeScenarioTested',
-//            'tester.scenario_tested.after' => 'onAfterScenarioTested',
+            'tester.scenario_tested.after' => 'onAfterScenarioTested',
             'tester.outline_tested.before' => 'onBeforeOutlineTested',
             'tester.outline_tested.after' => 'onAfterOutlineTested',
             'tester.step_tested.after' => 'onAfterStepTested',
