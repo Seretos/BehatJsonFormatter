@@ -1,5 +1,5 @@
 {
-  "name": "seretos/BehatJsonFormatter",
+  "name": "seretos/behat-json-formatter",
   "description": "this library extends behat with an json formatter and publish commands to manage this generated json files",
   "keywords": [
     "behat",
