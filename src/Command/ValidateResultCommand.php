@@ -34,21 +34,22 @@ class ValidateResultCommand extends BaseCommand {
 
         $files = $this->getFeatureFiles($output, $input->getOption('featureDir'));
 
+        if(count($files) === 0){
+            $output->writeln('<error>no feature files found!</error>');
+            return -1;
+        }
+
         $result = 0;
         foreach($files as $file){
             $fileContent = $factory->readFile($file);
 
-            preg_match_all('/#[\h]*(Szenario|Szenariogrundriss):/', $fileContent, $matches, PREG_SET_ORDER, 0);
-            if(count($matches)>0){
-                $output->writeln('<error>the file '.$file.' has commented scenarios</error>');
-                $result = -1;
-            }
-
             $feature = $parser->parse($fileContent);
+            $language = 'en';
             if($feature === null || $feature->getScenarios() === null){
                 $output->writeln('<error>empty file: '.$file.'</error>');
                 $result = -1;
             }else {
+                $language = $feature->getLanguage();
                 foreach ($feature->getScenarios() as $scenario) {
                     if(!$this->hasScenario($scenario, $feature,$json)){
                         $output->writeln('<error>scenario not executed: '.$scenario->getTitle().'</error>');
@@ -57,6 +58,13 @@ class ValidateResultCommand extends BaseCommand {
                         $output->writeln('<info>'.$scenario->getTitle().'</info>');
                     }
                 }
+            }
+            $search = $factory->getKeywords()[$language]['scenario'].'|'.$factory->getKeywords()[$language]['scenario_outline'];
+
+            preg_match_all('/#[\h]*('.$search.'):/', $fileContent, $matches, PREG_SET_ORDER, 0);
+            if(count($matches)>0){
+                $output->writeln('<error>the file '.$file.' has commented scenarios</error>');
+                $result = -1;
             }
         }
         return $result;
@@ -79,17 +87,14 @@ class ValidateResultCommand extends BaseCommand {
     }
 
     private function hasScenario(ScenarioInterface $featureScenario, FeatureNode $featureNode,$json){
-        foreach($json['suites'] as $suite){
-            foreach($suite['features'] as $feature){
-                if($featureNode->getTitle() == $feature['title']) {
-                    foreach ($feature['scenarios'] as $currentTitle => $scenario) {
-                        if ($featureScenario->getTitle() == $currentTitle) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
+        if(isset($json['suites']))
+            foreach ($json['suites'] as $suite)
+                foreach ($suite['features'] as $feature)
+                    if ($featureNode->getTitle() == $feature['title'])
+                        foreach ($feature['scenarios'] as $currentTitle => $scenario)
+                            if ($featureScenario->getTitle() == $currentTitle)
+                                return true;
+
         return false;
     }
 

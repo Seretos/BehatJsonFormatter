@@ -16,6 +16,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 class CommandFactory {
+    private $keywords;
+
     /**
      * @return Finder
      */
@@ -40,15 +42,20 @@ class CommandFactory {
         $fileSystem->dumpFile($file,json_encode($data, JSON_PRETTY_PRINT));
     }
 
-    public function createBehatParser(){
-        $keywords = [];
-        if(file_exists(__DIR__.'/../../../../behat/gherkin/i18n.php')){
-            $keywords = include(__DIR__ . '/../../../../behat/gherkin/i18n.php');
-        }else if(file_exists(__DIR__.'/../../vendor/behat/gherkin/i18n.php')){
-            $keywords = include(__DIR__ . '/../../vendor/behat/gherkin/i18n.php');
+    public function getKeywords(){
+        if($this->keywords === null) {
+            $this->keywords = [];
+            if (file_exists(__DIR__ . '/../../../../behat/gherkin/i18n.php')) {
+                $this->keywords = include(__DIR__ . '/../../../../behat/gherkin/i18n.php');
+            } else if (file_exists(__DIR__ . '/../../vendor/behat/gherkin/i18n.php')) {
+                $this->keywords = include(__DIR__ . '/../../vendor/behat/gherkin/i18n.php');
+            }
         }
+        return $this->keywords;
+    }
 
-        $keywords = new ArrayKeywords($keywords);
+    public function createBehatParser(){
+        $keywords = new ArrayKeywords($this->getKeywords());
         $lexer  = new Lexer($keywords);
         $parser = new Parser($lexer);
         return $parser;

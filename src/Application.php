@@ -10,6 +10,7 @@ namespace seretos\BehatJsonFormatter;
 
 
 use seretos\BehatJsonFormatter\Command\DoubleResultCheckCommand;
+use seretos\BehatJsonFormatter\Command\HtmlResultCommand;
 use seretos\BehatJsonFormatter\Command\MergeResultCommand;
 use seretos\BehatJsonFormatter\Command\ValidateResultCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,6 +48,9 @@ class Application extends BaseApplication implements ContainerAwareInterface{
     }
 
     protected function registerCommands () {
-        $this->addCommands([new DoubleResultCheckCommand(), new MergeResultCommand(), new ValidateResultCommand()]);
+        $this->addCommands([new DoubleResultCheckCommand(),
+            new MergeResultCommand(),
+            new ValidateResultCommand(),
+            new HtmlResultCommand()]);
     }
 }

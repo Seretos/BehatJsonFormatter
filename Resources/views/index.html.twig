@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $( document ).ready(function() {
+            $("#modeBtn").click(function(){
+               $(this).toggleClass('btn-primary','btn-secondary');
+               $("#leftSide").toggleClass('hide','');
+               if($("#rightSide").hasClass('col-md-12')){
+                   $("#rightSide").removeClass('col-md-12');
+                   $("#rightSide").addClass('col-md-7');
+               }
+               else{
+                   $("#rightSide").removeClass('col-md-7');
+                   $("#rightSide").addClass('col-md-12');
+               }
+            });
+
+            var envCanvas = document.getElementById("myChart").getContext('2d');
+
+            var myPieChart = new Chart(envCanvas,{
+                type: 'pie',
+                data: {
+                    datasets: [{
+                        label: "Environments",
+                        data: [
+                            {% set start = 0 %}
+                            {% for environment in bar.environments %}
+                            {% if start > 0 %},{% endif %}{{ environment.passed + environment.failed }}
+                                {% set start = start + 1 %}
+                            {% endfor %}
+                        ],
+                        backgroundColor: ["rgb(255, 99, 132)","rgb(54, 162, 235)"]
+                    }],
+                    labels: [
+                        {% set start = 0 %}
+                        {% for environment in bar.environments|keys %}
+                        {% if start > 0 %},{% endif %}"{{ environment }}"
+                        {% set start = start + 1 %}
+                        {% endfor %}
+                    ]
+                },
+                options: {
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="navbar navbar-default">
+        <div class="container-fluid">
+            <h1>
+                <span>Testresults{% if headerName is not empty %}[{{ headerName }}]{% endif %}
+                </span>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-secondary" id="modeBtn">simple</button>
+                </div>
+            </h1>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-5" id="leftSide">
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div style="width:200px;float:left;text-align: center;">
+                            <canvas id="myChart" width="100" height="100"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table">
+                                <tbody>
+                                <tr>
+                                    <th>tests</th>
+                                    <td>{{ bar.tests }}</td>
+                                </tr>
+                                <tr>
+                                    <th>test executions</th>
+                                    <td>{{ bar.executions }}</td>
+                                </tr>
+                                {% for environment in bar.environments|keys %}
+                                    <tr>
+                                        <th>&emsp;{{ environment }}</th>
+                                        <td>
+                                            <span
+                                                    class="bg-{% if bar.environments[environment].failed == 0 %}success{% else %}danger{% endif %}">
+                                                {{ bar.environments[environment].passed }}/{{ bar.environments[environment].failed }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <ul class="nav nav-tabs">
+                            {% set start = 0 %}
+                            {% for suite in features.suites|keys %}
+                                <li {% if start == 0 %}class="active"{% endif %}><a data-toggle="tab" href="#{{ suite }}">{{ suite }}</a></li>
+                                {% set start = start + 1 %}
+                            {% endfor %}
+                        </ul>
+                        <div class="tab-content">
+                            {% set start = 0 %}
+                            {% for suite in features.suites|keys %}
+                                <div id="{{ suite }}" class="tab-pane fade {% if start == 0 %}in active{% endif %}">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>feature</th>
+                                            <th>scenarios</th>
+                                            {% for environment in features.environments %}
+                                            <th>{{ environment }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for feature in features.suites[suite].features %}
+                                                <tr>
+                                                    <td><a data-toggle="collapse" data-parent="#rightSide" href="#{{ feature.id }}">{{ feature.title }}</a></td>
+                                                    <td class="text-center">{{ feature.scenarios }}</td>
+                                                    {% for environment in features.environments %}
+                                                        <td class="text-center">
+                                                        {% if feature.environments[environment] is not empty %}
+                                                            {{ feature.environments[environment].passed }}/{{ feature.environments[environment].failed }}
+                                                        {% endif %}
+                                                        </td>
+                                                    {% endfor %}
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% set start = start + 1 %}
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-7" id="rightSide">
+                <div  class="panel panel-default">
+                {% for feature in featureContents %}
+                <div class="panel-collapse collapse" id="{{ feature.id }}">
+                    <div class="panel-body">
+                        <h3>{{ feature.title }}</h3>
+                        <p>{{ feature.description }}</p><br/>
+                        {% for scenarioKey in feature['scenarios']|keys %}
+
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <b class="text-warning">Scenario:</b> {{ scenarioKey }}
+                                            </td>
+                                            {% for environmentKey in feature['scenarios'][scenarioKey]['results']|keys %}
+                                                <th>{{ environmentKey }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                        {% for stepLine in feature['scenarios'][scenarioKey]['steps']|keys %}
+                                            {% set text = feature['scenarios'][scenarioKey]['steps'][stepLine]['text'] %}
+                                            <tr>
+                                                <td>
+                                                    &emsp;<b class="text-warning">{{ feature['scenarios'][scenarioKey]['steps'][stepLine]['keyword'] }}</b> {{ text|raw }}
+                                                </td>
+                                            </tr>
+                                            {% if feature['scenarios'][scenarioKey]['steps'][stepLine]['arguments'] is not empty %}
+                                                <tr>
+                                                    <td>
+                                                        <table class="table">
+                                                            {% for row in feature['scenarios'][scenarioKey]['steps'][stepLine]['arguments'] %}
+                                                                <tr>
+                                                                {% for cell in row %}
+                                                                    <td>{{ cell }}</td>
+                                                                {% endfor %}
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table><br/>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
