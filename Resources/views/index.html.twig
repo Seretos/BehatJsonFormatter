@@ -84,13 +84,10 @@
                                     <td>{{ bar.executions }}</td>
                                 </tr>
                                 {% for environment in bar.environments|keys %}
-                                    <tr>
+                                    <tr class="bg-{% if bar.environments[environment].failed == 0 %}success{% else %}danger{% endif %}">
                                         <th>&emsp;{{ environment }}</th>
                                         <td>
-                                            <span
-                                                    class="bg-{% if bar.environments[environment].failed == 0 %}success{% else %}danger{% endif %}">
                                                 {{ bar.environments[environment].passed }}/{{ bar.environments[environment].failed }}
-                                            </span>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -125,7 +122,15 @@
                                         </thead>
                                         <tbody>
                                             {% for feature in features.suites[suite].features %}
-                                                <tr>
+                                                {% set class = 'bg-success' %}
+                                                {% for environment in features.environments %}
+                                                    {% if feature.environments[environment] is not empty %}
+                                                        {% if feature.environments[environment].failed > 0 %}
+                                                            {% set class = 'bg-danger' %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <tr class="{{ class }}">
                                                     <td><a data-toggle="collapse" data-parent="#rightSide" href="#{{ feature.id }}">{{ feature.title }}</a></td>
                                                     <td class="text-center">{{ feature.scenarios }}</td>
                                                     {% for environment in features.environments %}
@@ -164,29 +169,47 @@
                                                 <b class="text-warning">Scenario:</b> {{ scenarioKey }}
                                             </td>
                                             {% for environmentKey in feature['scenarios'][scenarioKey]['results']|keys %}
-                                                <th>{{ environmentKey }}</th>
+                                                <th class="text-center">{{ environmentKey }}</th>
                                             {% endfor %}
                                         </tr>
                                         {% for stepLine in feature['scenarios'][scenarioKey]['steps']|keys %}
                                             {% set text = feature['scenarios'][scenarioKey]['steps'][stepLine]['text'] %}
-                                            <tr>
+                                            {% set class = 'bg-success' %}
+                                            {% for environmentKey in feature['scenarios'][scenarioKey]['results']|keys %}
+                                                {% if feature['scenarios'][scenarioKey]['results'][environmentKey]['steps'][stepLine]['passed'] != true %}
+                                                    {% set class = 'bg-danger' %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            <tr class="{{ class }}">
                                                 <td>
                                                     &emsp;<b class="text-warning">{{ feature['scenarios'][scenarioKey]['steps'][stepLine]['keyword'] }}</b> {{ text|raw }}
                                                 </td>
+                                                {% for environmentKey in feature['scenarios'][scenarioKey]['results']|keys %}
+                                                    <td class="text-center">
+                                                        {% if feature['scenarios'][scenarioKey]['results'][environmentKey]['steps'][stepLine]['passed'] == true %}
+                                                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                                        {% else %}
+                                                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                                        {% endif %}
+                                                    </td>
+                                                {% endfor %}
                                             </tr>
                                             {% if feature['scenarios'][scenarioKey]['steps'][stepLine]['arguments'] is not empty %}
-                                                <tr>
+                                                <tr class="{{ class }}">
                                                     <td>
-                                                        <table class="table">
+                                                        <table>
                                                             {% for row in feature['scenarios'][scenarioKey]['steps'][stepLine]['arguments'] %}
                                                                 <tr>
                                                                 {% for cell in row %}
-                                                                    <td>{{ cell }}</td>
+                                                                    <td style="padding-left:20px;"><b class="text-primary">{{ cell }}</b></td>
                                                                 {% endfor %}
                                                                 </tr>
                                                             {% endfor %}
                                                         </table>
                                                     </td>
+                                                    {% for environmentKey in feature['scenarios'][scenarioKey]['results']|keys %}
+                                                        <td></td>
+                                                    {% endfor %}
                                                 </tr>
                                             {% endif %}
                                         {% endfor %}

@@ -170,7 +170,10 @@ EOT
             if($scenarioStep === null){
                 $scenarioStep = new BehatStep();
                 $scenarioStep->setKeyWord($step['keyword'])
-                             ->setText($step['text']);
+                    ->setText($step['text']);
+                if(isset($step['arguments'])){
+                    $scenarioStep->setArguments($step['arguments']);
+                }
             }
             $featureScenario->setStep($line, $scenarioStep);
         }
