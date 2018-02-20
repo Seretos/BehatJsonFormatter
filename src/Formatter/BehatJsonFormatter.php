@@ -246,6 +246,9 @@ class BehatJsonFormatter implements Formatter {
 
     private function getEnvironment(){
         $browser = $this->browser;
+        if($browser === 'internet explorer'){
+            $browser = 'ie';
+        }
         if(!$this->mink->getSession()->getDriver() instanceof Selenium2Driver){
             $browser = 'unknown';
         }else{
