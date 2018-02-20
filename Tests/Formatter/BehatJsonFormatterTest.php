@@ -241,6 +241,11 @@ class BehatJsonFormatterTest extends TestCase {
                                    ->disableOriginalConstructor()
                                    ->getMock();
 
+        $reflection = new \ReflectionClass(Selenium2Driver::class);
+        $property = $reflection->getProperty('desiredCapabilities');
+        $property->setAccessible(true);
+        $property->setValue($mockSeleniumDriver,['browser' => 'firefly']);
+
         $this->minkSession->expects($this->any())
                           ->method('getDriver')
                           ->will($this->returnValue($mockSeleniumDriver));
@@ -297,6 +302,11 @@ class BehatJsonFormatterTest extends TestCase {
         $mockSeleniumDriver = $this->getMockBuilder(Selenium2Driver::class)
                                    ->disableOriginalConstructor()
                                    ->getMock();
+
+        $reflection = new \ReflectionClass(Selenium2Driver::class);
+        $property = $reflection->getProperty('desiredCapabilities');
+        $property->setAccessible(true);
+        $property->setValue($mockSeleniumDriver,['browser' => 'firefly']);
 
         $this->minkSession->expects($this->any())
                           ->method('getDriver')
@@ -404,6 +414,11 @@ class BehatJsonFormatterTest extends TestCase {
                                    ->disableOriginalConstructor()
                                    ->getMock();
 
+        $reflection = new \ReflectionClass(Selenium2Driver::class);
+        $property = $reflection->getProperty('desiredCapabilities');
+        $property->setAccessible(true);
+        $property->setValue($mockSeleniumDriver,['browser' => 'firefly']);
+
         $this->minkSession->expects($this->any())
                           ->method('getDriver')
                           ->will($this->returnValue($mockSeleniumDriver));
@@ -459,6 +474,11 @@ class BehatJsonFormatterTest extends TestCase {
         $mockSeleniumDriver = $this->getMockBuilder(Selenium2Driver::class)
                                    ->disableOriginalConstructor()
                                    ->getMock();
+
+        $reflection = new \ReflectionClass(Selenium2Driver::class);
+        $property = $reflection->getProperty('desiredCapabilities');
+        $property->setAccessible(true);
+        $property->setValue($mockSeleniumDriver,['browser' => 'firefly']);
 
         $this->minkSession->expects($this->any())
                           ->method('getDriver')
@@ -525,6 +545,11 @@ class BehatJsonFormatterTest extends TestCase {
         $mockSeleniumDriver = $this->getMockBuilder(Selenium2Driver::class)
                                    ->disableOriginalConstructor()
                                    ->getMock();
+
+        $reflection = new \ReflectionClass(Selenium2Driver::class);
+        $property = $reflection->getProperty('desiredCapabilities');
+        $property->setAccessible(true);
+        $property->setValue($mockSeleniumDriver,['browser' => 'firefly']);
 
         $this->minkSession->expects($this->any())
                           ->method('getDriver')
