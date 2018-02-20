@@ -255,7 +255,6 @@ class BehatJsonFormatter implements Formatter {
             $property = $reflection->getProperty('desiredCapabilities');
             $property->setAccessible(true);
             $values = $property->getValue($driver);
-            $browser = $values['browser'];
             if(isset($values['version']) && $values['version'] !== ''){
                 $browser .= ' '.$values['version'];
             }
