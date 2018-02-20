@@ -248,6 +248,17 @@ class BehatJsonFormatter implements Formatter {
         $browser = $this->browser;
         if(!$this->mink->getSession()->getDriver() instanceof Selenium2Driver){
             $browser = 'unknown';
+        }else{
+            /* @var $driver Selenium2Driver*/
+            $driver = $this->mink->getSession()->getDriver();
+            $reflection = new \ReflectionClass(Selenium2Driver::class);
+            $property = $reflection->getProperty('desiredCapabilities');
+            $property->setAccessible(true);
+            $values = $property->getValue($driver);
+            $browser = $values['browser'];
+            if(isset($values['version']) && $values['version'] !== ''){
+                $browser .= ' '.$values['version'];
+            }
         }
         return $browser;
     }
