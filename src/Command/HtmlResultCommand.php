@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Twig_Environment;
+use Twig_Extension_Debug;
 use Twig_Loader_Filesystem;
 
 class HtmlResultCommand extends BaseCommand
@@ -25,7 +26,8 @@ class HtmlResultCommand extends BaseCommand
      */
     public function execute (InputInterface $input, OutputInterface $output) {
         $loader = new Twig_Loader_Filesystem(__DIR__.'/../../Resources/views');
-        $twig = new Twig_Environment($loader);
+        $twig = new Twig_Environment($loader,['debug' => true]);
+        $twig->addExtension(new Twig_Extension_Debug());
 
         $path = rtrim($input->getOption('output'),'/').'/';
 
@@ -61,7 +63,7 @@ class HtmlResultCommand extends BaseCommand
     private function hightlightStepArguments(array $scenarios){
         foreach($scenarios as $scenarioId => $scenario){
             foreach($scenario['steps'] as $stepId => $step){
-                $scenarios[$scenarioId]['steps'][$stepId]['text'] = preg_replace('/"(.[^"]*)"/','<b class="text-primary">"${1}"</b>',$step['text']);
+                $scenarios[$scenarioId]['steps'][$stepId]['text'] = preg_replace('/"(.[^"]*)"/','<b class="text-primary">"${1}"</b>',str_replace('&quot;','"',htmlspecialchars ($step['text'])));
             }
         }
         return $scenarios;
